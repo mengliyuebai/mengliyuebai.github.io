@@ -1,4 +1,4 @@
-## 
+
 
 [Merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/) allow you to visualize and collaborate on the proposed changes to source code that exist as commits on a given Git branch.A Merge Request (MR) is the basis of GitLab as a code collaboration and version control platform. 
 

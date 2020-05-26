@@ -1,6 +1,4 @@
-## 二、基于Merge Request的开发流程
-
-[[_TOC_]]
+## 基于Merge Request的开发流程
 
 [Merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/) allow you to visualize and collaborate on the proposed changes to source code that exist as commits on a given Git branch.A Merge Request (MR) is the basis of GitLab as a code collaboration and version control platform. 
 
@@ -84,4 +82,5 @@ MR被合并后，可选操作
 6. /assign @user，分配给某人
 
 [Closing issues automatically](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#default-closing-pattern) 如果提交信息或合并请求的描述包含了 [defined pattern](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#default-closing-pattern) 议题将被自动关闭 
+
 >  For example, if Closes #4, #6, Related to #5 is included in a Merge Request description, issues #4 and #6 will close automatically when the MR is merged, but not #5. Using Related to flags #5 as a related issue, but it will not close automatically.If the issue is in a different repository than the MR, add the full URL for the issue(s)。

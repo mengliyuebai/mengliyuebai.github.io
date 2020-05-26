@@ -1,6 +1,6 @@
-## **一、以Issues为导向的管理流程**
+## **以Issues为导向的管理流程**
 
-[[_TOC_]]
+
 
 [GitLab Issues](https://docs.gitlab.com/ce/user/project/issues/index.html) are the fundamental medium for collaborating on ideas and planning work in GitLab.
 

@@ -1,0 +1,160 @@
+# 4、GitLab规范和建议
+
+## **1、使用过程中的规范**
+
+1. 本服务器为产品开发库。禁止上传与产品无关的视频、音频和图像文件等大文件。
+2. 用户本地参数user.name和user.email，建议与GitLab服务端注册的用户名和密码一致。
+3. 正式发布的产品版本，必须打版本标签（tag），并设置为受保护标签。
+4. 离职人员，禁用账号，并从群组和项目中移除该用户。
+5. 转岗人员，从群组和项目中移除该用户。
+6. 建议，分支合并前，先执行git pull，拉取目标分支，解决冲突后，再git push。
+7. 建议，使用GitLab合并请求功能，手动合并使用--no-ff参数，以保留合并历史轨迹 。如git merge --no-ff feat-add-readme。
+
+说明1：user.name和user.email与服务端，不一致，将导致提交信息、Profile page等无法正确显示用户活动。
+
+说明2：账号被禁用（block）后，不能登录，但保留了用户的修改历史，个人项目（当前，取消了默认可以创建个人项目的功能）。
+
+## **2、开发过程中的建议**
+
+### **1）基于Issue进行开发**
+
+任何开发工作都基于需求或缺陷，每次代码变更都始于一个Issue，这种方式让Issue和code之间的关系更透明。
+
+比如，超过1工时的工作量，就需要创建Issue后，再进行开发。
+
+使用sprint计划的敏捷团队，增加Issue是开发工作的一部分。Issue标题应该描述系统的期望状态。比如，“作为一个管理员，我希望在删除用户的时候，不要收到一个错误提示。“，远比”管理员不能删除用户“这种描述更好。
+
+当你准备解决一个Issue的时候，基于master分支创建新的功能分支，分支名根据组织规范，开发完后，提交合并请求。
+
+### **2）使用合并请求功能**
+
+合并请求（Merge Request），在GitLab应用上创建，要求指定人合并两个分支。
+
+合并请求并非都是在完成功能后，需要合并的时候才发起。如果工作一段时间后，需要与团队分享中间成功，方法是，创建合并请求但不分配给任何人，只是在描述或评论中使用如"/cc@mark @susan“的形式，提醒他人关注。表明还没准备好合并，但欢迎反馈。
+
+在合并请求的标题，以[WIP] or WIP:开头，可以保护请求不会被合并。
+
+Start the title of the merge request with [WIP] or WIP: to prevent it from being merged before it’s ready.
+
+合并请求功能就是一个代码审查（code review）工具。通过审查的请求被合并，不通过的关闭。
+
+合并请求总是会创建一个合并提交，即使什么都没合并，这种合并策略在Git里被称之为“no fast-forward”。合并后的功能分支就没用了，删掉，这样GitLab的分支列表，显示的都是正在进行的工作。
+
+在提交信息或合并请求的描述中关联Issue。比如 “Fixes #16”或“closes #67，功能分支成功并入目标分支后， #16”、 #67将被自动关闭。
+
+### **3）使用Squash压缩提交**
+
+在合并请求前，git rebase -i 非常有用，可以将多个提交压缩为一个或重新整理提交，使之更加符合逻辑。
+
+切记，绝对不能rebase已经推送到远程的提交。
+
+变基，为你所有的更改创建新的提交，这可能导致混乱，因为相同的更改可能有多个标识符。
+
+如果分支为合作开发，rebase会导致他人合并错误，因为他们的版本历史和你的版本历史不匹配。
+
+已经review过的代码，不可变基。
+
+即使为解决合并包含的很多提交，导致撤销困难的问题，压缩提交，但也绝不可rebase已经推送的提交。
+
+推荐，手动合并时，使用git merge --no-ff方式
+
+### **4）**减少功能分支中的合并提交
+
+大量的合并提交（merge commits）会制造一个历史混乱的版本库。 因此，应该尝试使用git rebase，来避免在功能分支中的合并提交。
+
+相比合并提交，rebase会创建一个整齐的线性历史记录。
+
+切记，不要rebase已经推送到远程服务的提交。
+
+rebase增加了工作量，每次rebase都不得不解决相似的冲突。如何取舍merge和rebase，Atlassian公司的博客写的更好。Atlassian has a more thorough explanation of the tradeoffs between merging and rebasing [on their blog](https://www.atlassian.com/blog/git/git-team-workflows-merge-or-rebase). 
+
+只在需要master上的新代码、解决合并冲突和更新长期分支的时候merge master分支到功能分支。
+
+长期存在的功能分支，需要merge提交来保持与最新代码的一致性。所以，功能分支的生存周期应该在一个工作日内，如果太长，说明需要拆分为更小的工作单元。
+
+如果功能分支超过一天还不能关闭，需要制定更新策略，比如每天早上，使用持续集成并入master分支或者选择只在明确的时间点合并。
+
+使用 [feature toggles](https://martinfowler.com/bliki/FeatureToggle.html) 功能，隐藏不完整的功能。
+
+注意：不要将自动分支构建测试和CI混为一谈。
+
+马丁·福勒曰：自动分支构建，善，然，无集成，不CI。
+
+>  Martin Fowler makes this distinction in [his article about feature branches](https://martinfowler.com/bliki/FeatureBranch.html)
+>
+> “I’ve heard people say they are doing CI because they are running builds, perhaps using a CI server, on every branch with every commit. That’s continuous building, and a Good Thing, but there’s no integration, so it’s not CI.”
+
+你要减少合并提交，而不是消灭它；代码库力求干净，但历史记录应该反映真实行为。软件开发道阻且长，你的记录就是你的勋章。
+
+实在看不懂自己提交的混乱历史记录，就用可视化工具看，但是如果你rebase搞砸了，就没救了。
+
+### **5）**经常提交和频繁推送
+
+### **6）**写一份言之有物的提交说明
+
+How to write a good commit message
+
+**Commit message内容：**
+
+提交信息，写明，你为什么做，想达到什么目的，不是仅说明你做了什么。
+
+**BAD：**
+
+`git commit -m 'add user.rb'`
+
+**Good:**
+
+`git ocmmit -m 'create user model to store user session informaiton'`
+
+**Commit message格式：**
+
+[Angular规范](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines)，使用最广的写法，比较合理和系统化，并且有配套的工具。
+
+Commit message 都包括三个部分：Header，Body 和 Footer。
+
+`<type>(<scope>): <subject> `
+
+`// 空一行 `
+
+`<body> `
+
+`// 空一行 `
+
+`<footer>`
+
+type用于说明 commit 的类别，只允许使用下面7个标识。
+
+1. feat：新功能（feature）
+2. fix：修补bug
+3. docs：文档（documentation）
+4. style： 格式（不影响代码运行的变动）
+5. refactor：重构（即不是新增功能，也不是修改bug的代码变动）
+6. test：增加测试
+7. chore：构建过程或辅助工具的变动
+
+如果type为feat和fix，则该 commit 将肯定出现在 Change log 之中。
+
+[Commitizen](https://github.com/commitizen/cz-cli)是一个撰写合格 Commit message 的工具。
+
+[conventional-changelog](https://github.com/ajoslin/conventional-changelog) 就是生成 Change log 的工具。
+
+参考：http://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html
+
+**7）测试后再合并**
+
+非GitLab flow，CI服务器一般仅在master分支上运行测试。使用GitLab分支，开发者基于该master分支创建自己的开发分支，为保障CI不被中断，必须通过测试后，才能接受合并请求。
+
+缺点是，CI仅测试了功能分支，而不是测试合并后的结果。每次master分支改变后都进行测试，当然更为理想。但这样做，导致频繁等待测试结果，成本较高。
+
+如果master分支的新提交与功能分支冲突，将master并入功能分支后，再重新运行测试。如果功能分支总是活的很久，那就要细分任务，创建更小的功能分支，让它短命。
+
+**8）在功能分支上开发**
+
+基于最新的master创建功能分支。如果一开始，就知道工作依赖另一个分支，就基于依赖分支创建。
+
+如果需要并入其他分支，请在合并提交中写明原因。
+
+只有没有推送的分支，可以使用rebase操作。
+
+如果你的分支可以正常工作，就不要从上游分支合并代码。仅在需要的时候进行合并，历史更干净。
+
